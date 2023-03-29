@@ -1,9 +1,12 @@
 import fastify from 'fastify' // importando fastify
+import { knex } from './database'
 
 const app = fastify() // chamar o fastify
 
-app.get('/hello', () => {
-  return 'Hello World'
+app.get('/hello', async () => {
+  const tables = await knex('sqlite_schema').select('*') // buscar todos os dados da tabela
+
+  return tables
 })
 
 app
