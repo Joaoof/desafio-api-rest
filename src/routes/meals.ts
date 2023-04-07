@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto'
 import { knex } from '../database'
 
 export async function mealsRoutes(app: FastifyInstance) {
-  app.get('/hello', async () => {
+  app.post('/', async (request, reply) => {
     const createUserBodySchema = z.object({
       name: z.string(),
       email: z.string(),
@@ -13,10 +13,13 @@ export async function mealsRoutes(app: FastifyInstance) {
 
     const { name, email, password } = createUserBodySchema.parse(request.body)
 
-    const meals = await knex('meals').insert({
+    await knex('meals').insert({
       id: randomUUID(),
+      name,
+      email,
+      password,
     })
 
-    return meals
+    return reply.status(201).send()
   })
 }
