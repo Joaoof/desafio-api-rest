@@ -3,11 +3,13 @@ import fastify from 'fastify'
 const app = fastify()
 
 app.get('/hello', () => {
-  return "Hello Word"
+  return 'Hello Word'
 })
 
-app.listen({
-  port: 3333,
-}).then(() => {
-  console.log('Server have ok!')
-})
+app
+  .listen({
+    port: 3333,
+  })
+  .then(() => {
+    console.log('Server have ok!')
+  })
