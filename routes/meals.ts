@@ -5,6 +5,24 @@ import { FastifyInstance } from 'fastify'
 import bcrypt from 'bcryptjs'
 
 export async function mealsRoutes(app: FastifyInstance) {
+  app.get('/', async () => {
+    const meals = await knex('meals').select()
+
+    return { total: 3, meals }
+  })
+
+  app.get('/:id', async (request) => {
+    const getMealsParamsSchema = z.object({
+      id: z.string().uuid(),
+    })
+
+    const { id } = getMealsParamsSchema.parse(request.params)
+
+    const meal = await knex('meals').where('id', id).first()
+
+    return { meal }
+  })
+
   app.post('/', async (request, reply) => {
     const createMealsBodySchema = z.object({
       name: z.string(),
