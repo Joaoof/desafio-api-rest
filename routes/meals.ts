@@ -1,18 +1,30 @@
+import { randomUUID } from 'node:crypto'
 import { knex } from '../src/database'
-import crypto from 'node:crypto'
+import { z } from 'zod'
 import { FastifyInstance } from 'fastify'
+import bcrypt from 'bcryptjs'
 
 export async function mealsRoutes(app: FastifyInstance) {
-  app.get('/hello', async () => {
-    const meals = await knex('meals')
-      .insert({
-        id: crypto.randomUUID(),
-        name: 'Criação de usuario teste',
-        email: 'joaodeus400@gmail.com',
-        password_hash: 'senha123',
-      })
-      .returning('*')
+  app.post('/', async (request, reply) => {
+    const createMealsBodySchema = z.object({
+      name: z.string(),
+      email: z.string(),
+      password: z.string(),
+    })
 
-    return meals
+    const { name, email, password } = createMealsBodySchema.parse(request.body)
+
+    // eslint-disable-next-line camelcase
+    const password_hash = await bcrypt.hash(password, 10)
+
+    await knex('meals').insert({
+      id: randomUUID(),
+      name,
+      email,
+      // eslint-disable-next-line camelcase
+      password_hash,
+    })
+
+    return reply.status(201).send()
   })
 }
