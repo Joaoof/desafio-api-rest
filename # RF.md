@@ -1,8 +1,8 @@
 # RF
 
-- [] Deve ser possivel criar um user
-- [] Deve ser possível listar todas as refeições de um usuário
-- [] Deve ser possível visualizar uma única refeição
+- [x] Deve ser possivel criar um user
+- [x] Deve ser possível listar todas as refeições de um usuário
+- [x] Deve ser possível visualizar uma única refeição
 
 # RN
 

@@ -23,6 +23,12 @@ export async function mealsRoutes(app: FastifyInstance) {
     return { meal }
   })
 
+  app.get('/summary', async () => {
+    const summary = await knex('meals').sum('amount', { as: 'amount' }).first()
+
+    return { summary }
+  })
+
   app.post('/', async (request, reply) => {
     const createMealsBodySchema = z.object({
       name: z.string(),
