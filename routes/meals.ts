@@ -34,6 +34,8 @@ export async function mealsRoutes(app: FastifyInstance) {
       name: z.string(),
       email: z.string(),
       password: z.string(),
+      // amount: z.string(),
+      // type: z.enum(['dieta', 'fora da dieta']),
     })
 
     const { name, email, password } = createMealsBodySchema.parse(request.body)
@@ -41,12 +43,25 @@ export async function mealsRoutes(app: FastifyInstance) {
     // eslint-disable-next-line camelcase
     const password_hash = await bcrypt.hash(password, 10)
 
+    let sessionId = request.cookies.sessionId
+
+    if (!sessionId) {
+      sessionId = randomUUID()
+
+      reply.cookie('sessionId', sessionId, {
+        path: '/',
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      })
+    }
+
     await knex('meals').insert({
       id: randomUUID(),
       name,
       email,
       // eslint-disable-next-line camelcase
       password_hash,
+      // amount: (type === 'dieta' ? amount : Number(amount) * -1).toString(),
+      session_id: sessionId,
     })
 
     return reply.status(201).send()
