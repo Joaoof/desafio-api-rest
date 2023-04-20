@@ -3,13 +3,13 @@ import { knex } from '../src/database'
 import { z } from 'zod'
 import { FastifyInstance } from 'fastify'
 import bcrypt from 'bcryptjs'
-import { checkSessionExists } from '../src/middlewares/check-session-id-exits'
+import { checkSessionIdExists } from '../src/middlewares/check-session-id-exits'
 
 export async function mealsRoutes(app: FastifyInstance) {
   app.get(
     '/',
     {
-      preHandler: [checkSessionExists],
+      preHandler: [checkSessionIdExists],
     },
     async (request, reply) => {
       const { sessionId } = request.cookies
@@ -25,7 +25,7 @@ export async function mealsRoutes(app: FastifyInstance) {
   app.get(
     '/:id',
     {
-      preHandler: [checkSessionExists],
+      preHandler: [checkSessionIdExists],
     },
     async (request) => {
       const getMealsParamsSchema = z.object({
@@ -50,7 +50,7 @@ export async function mealsRoutes(app: FastifyInstance) {
   app.get(
     '/summary',
     {
-      preHandler: [checkSessionExists],
+      preHandler: [checkSessionIdExists],
     },
     async (request) => {
       const { sessionId } = request.cookies
@@ -67,16 +67,19 @@ export async function mealsRoutes(app: FastifyInstance) {
   app.post(
     '/',
     {
-      preHandler: [checkSessionExists],
+      preHandler: [checkSessionIdExists],
     },
     async (request, reply) => {
       const createMealsBodySchema = z.object({
         name: z.string(),
         email: z.string(),
         password: z.string(),
-        // amount: z.string(),
+        amount: z.string(),
         // type: z.enum(['dieta', 'fora da dieta']),
       })
+
+      // app.addHook('preHandler', checkSessionIdExists)
+      // })
 
       const { name, email, password } = createMealsBodySchema.parse(
         request.body,

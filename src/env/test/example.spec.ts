@@ -1,9 +1,23 @@
-import { expect, test } from 'vitest'
+import { test, beforeAll, afterAll } from 'vitest'
+import request from 'supertest'
+import { app } from '../../app'
 
-test('o usuário consegue criar uma refeição', () => {
-  // fazer a chamada hTTP p/ criar um nova transação
+beforeAll(async () => {
+  await app.ready()
+})
 
-  const responseStatusCode = 201
+afterAll(async () => {
+  await app.close()
+})
 
-  expect(responseStatusCode).toEqual(201)
+test('o usuário consegue criar uma refeição', async () => {
+  await request(app.server)
+    .post('/')
+    .send({
+      name: 'João',
+      email: 'aleatorio400@gmail.com',
+      password: 'senha123',
+      amount: 'Olá',
+    })
+    .expect(201)
 })
