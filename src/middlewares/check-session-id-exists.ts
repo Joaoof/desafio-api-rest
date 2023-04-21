@@ -8,7 +8,7 @@ export async function checkSessionIdExists(
 
   if (!sessionId) {
     return reply.status(401).send({
-      error: 'Unathorized',
+      error: 'Unauthorized',
     })
   }
 }

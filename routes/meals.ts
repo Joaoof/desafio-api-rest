@@ -1,9 +1,9 @@
+/* eslint-disable prettier/prettier */
+import { FastifyInstance } from 'fastify'
+import { z } from 'zod'
 import { randomUUID } from 'node:crypto'
 import { knex } from '../src/database'
-import { z } from 'zod'
-import { FastifyInstance } from 'fastify'
-import bcrypt from 'bcryptjs'
-import { checkSessionIdExists } from '../src/middlewares/check-session-id-exits'
+import { checkSessionIdExists } from '../src/middlewares/check-session-id-exists'
 
 export async function mealsRoutes(app: FastifyInstance) {
   app.get(
@@ -14,11 +14,11 @@ export async function mealsRoutes(app: FastifyInstance) {
     async (request, reply) => {
       const { sessionId } = request.cookies
 
-      const meals = await knex('meals').where('session_id', sessionId).select()
+      const meal = await knex('meals').where('session_id', sessionId).select()
 
       // return { total: 3, meals }
 
-      return { meals }
+      return { meal }
     },
   )
 
@@ -28,6 +28,7 @@ export async function mealsRoutes(app: FastifyInstance) {
       preHandler: [checkSessionIdExists],
     },
     async (request) => {
+      app.addHook('preHandler', checkSessionIdExists)
       const getMealsParamsSchema = z.object({
         id: z.string().uuid(),
       })
@@ -36,14 +37,14 @@ export async function mealsRoutes(app: FastifyInstance) {
 
       const { sessionId } = request.cookies
 
-      const meal = await knex('meals')
+      const meals = await knex('meals')
         .where({
           session_id: sessionId,
           id,
         })
         .first()
 
-      return { meal }
+      return { meals }
     },
   )
 
@@ -66,16 +67,11 @@ export async function mealsRoutes(app: FastifyInstance) {
 
   app.post(
     '/',
-    {
-      preHandler: [checkSessionIdExists],
-    },
     async (request, reply) => {
       const createMealsBodySchema = z.object({
         name: z.string(),
         email: z.string(),
         password: z.string(),
-        amount: z.string(),
-        // type: z.enum(['dieta', 'fora da dieta']),
       })
 
       // app.addHook('preHandler', checkSessionIdExists)
@@ -86,7 +82,6 @@ export async function mealsRoutes(app: FastifyInstance) {
       )
 
       // eslint-disable-next-line camelcase
-      const password_hash = await bcrypt.hash(password, 10)
 
       let sessionId = request.cookies.sessionId
 
@@ -103,13 +98,10 @@ export async function mealsRoutes(app: FastifyInstance) {
         id: randomUUID(),
         name,
         email,
-        // eslint-disable-next-line camelcase
-        password_hash,
-        // amount: (type === 'dieta' ? amount : Number(amount) * -1).toString(),
+        password,
         session_id: sessionId,
       })
 
       return reply.status(201).send()
-    },
-  )
+    })
 }

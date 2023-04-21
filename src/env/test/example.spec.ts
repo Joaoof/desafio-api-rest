@@ -12,12 +12,11 @@ afterAll(async () => {
 
 test('o usuário consegue criar uma refeição', async () => {
   await request(app.server)
-    .post('/')
+    .post('/meals')
     .send({
-      name: 'João',
-      email: 'aleatorio400@gmail.com',
+      name: 'João de Deus',
+      email: 'joaodeus400@gmail.com',
       password: 'senha123',
-      amount: 'Olá',
     })
     .expect(201)
 })
