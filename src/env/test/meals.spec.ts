@@ -50,4 +50,57 @@ describe('Meals routes', () => {
       }),
     ])
   })
+
+  it('should be able to get specific meals', async () => {
+    const createMealsResponse = await request(app.server).post('/meals').send({
+      name: 'João de Deus',
+      email: 'joaodeus400@gmail.com',
+      password: 'senha123',
+    })
+
+    const cookies = createMealsResponse.get('Set-Cookie')
+
+    const listMealsResponse = await request(app.server)
+      .get('/meals')
+      .set('Cookie', cookies)
+      .expect(200)
+
+    const mealId = listMealsResponse.body.meal[0].id
+
+    const getMealsResponse = await request(app.server)
+      .get(`/meals/${mealId}`)
+      .set('Cookie', cookies)
+      .expect(200)
+
+    expect(getMealsResponse.body.meal).toEqual(
+      expect.objectContaining({
+        name: 'João de Deus',
+        email: 'joaodeus400@gmail.com',
+        password: 'senha123',
+      }),
+    )
+  })
+
+  it('should be able to list all meals', async () => {
+    const createMealsResponse = await request(app.server).post('/meals').send({
+      name: 'João de Deus',
+      email: 'joaodeus400@gmail.com',
+      password: 'senha123',
+    })
+
+    const cookies = createMealsResponse.get('Set-Cookie')
+
+    const listMealsResponse = await request(app.server)
+      .get('/meals')
+      .set('Cookie', cookies)
+      .expect(200)
+
+    expect(listMealsResponse.body.meal).toEqual([
+      expect.objectContaining({
+        name: 'João de Deus',
+        email: 'joaodeus400@gmail.com',
+        password: 'senha123',
+      }),
+    ])
+  })
 })
