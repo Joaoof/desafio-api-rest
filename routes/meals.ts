@@ -14,11 +14,13 @@ export async function mealsRoutes(app: FastifyInstance) {
     async (request, reply) => {
       const { sessionId } = request.cookies
 
-      const meal = await knex('meals').where('session_id', sessionId).select()
-
+      const meal = await knex('meals').where('session_id', sessionId).select('')
       // return { total: 3, meals }
 
-      return { meal }
+      const tables = await knex('meals-register').where('session_id', sessionId).select('')
+
+
+      return { meal, tables }
     },
   )
 
@@ -103,4 +105,42 @@ export async function mealsRoutes(app: FastifyInstance) {
 
       return reply.status(201).send()
     })
-}
+
+    app.post('/register-meals', async (request, reply) => {
+      const createMealBodySchema = z.object({
+        name: z.string(),
+        description: z.string(),
+        date: z.string(),
+        time: z.string(),
+        isDiet: z.boolean(),
+      })
+
+      const { name, description, date, time, isDiet } = createMealBodySchema.parse(
+        request.body,
+      )
+
+      let sessionId = request.cookies.sessionId
+
+
+      if (!sessionId) {
+        sessionId = randomUUID()
+
+        reply.cookie('sessionId', sessionId, {
+          path: '/',
+          maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+        })
+      }
+      
+      await knex('meals-register').insert({
+        id: randomUUID(),
+        name,
+        description,
+        date,
+        time,
+        isDiet,
+        session_id: sessionId,
+      });
+  
+      return reply.status(201).send();
+    },
+    )}
