@@ -122,6 +122,9 @@ export async function mealsRoutes(app: FastifyInstance) {
 
       let sessionId = request.cookies.sessionId
 
+      console.log('sessionId', sessionId)
+
+
 
       if (!sessionId) {
         sessionId = randomUUID()
@@ -231,4 +234,53 @@ export async function mealsRoutes(app: FastifyInstance) {
       
           return reply.status(204).send()
         },
-      )}
+      )
+        app.get(
+          '/metrics',
+          {
+            preHandler: [checkSessionIdExists],
+          },
+          async (request) => {
+            const { sessionId } = request.cookies
+        
+            
+    const totalMeals = await knex('meals-register')
+    .where({
+      session_id: sessionId,
+    })
+    .count('id', { as: 'count' })
+    .first()
+
+  const totalDietMeals = await knex('meals-register')
+    .where({
+      session_id: sessionId,
+      isDiet: true,
+    })
+    .count('id', { as: 'count' })
+    .first()
+
+  const totalNonDietMeals = await knex('meals-register')
+    .where({
+      session_id: sessionId,
+      isDiet: false,
+    })
+    .count('id', { as: 'count' })
+    .first()
+          //   const bestSequence = await knex.raw(`
+          //   SELECT 
+          //     date, 
+          //     COUNT(*) AS count 
+          //   FROM meals-register
+          //   WHERE 
+          //     session_id = ? 
+          //     AND isDiet = true
+          //   GROUP BY date
+          //   ORDER BY count DESC
+          //   LIMIT 1
+          // `, [sessionId])
+          return {
+            totalMeals: totalMeals?.count || 0,
+            totalDietMeals: totalDietMeals?.count || 0,
+            totalNonDietMeals: totalNonDietMeals?.count || 0,
+          }},             
+        )}
