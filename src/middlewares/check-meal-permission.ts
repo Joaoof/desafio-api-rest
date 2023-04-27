@@ -1,12 +1,12 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import knex from 'knex'
 
-export async function checkSessionIdExists(
+export async function checkMealPermission(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const { id } = request.params
   const sessionId = request.cookies.sessionId
+  const { id } = request.params as { id: string }
 
   const meal = await knex('meals-register')
     .where({ session_id: sessionId, id })
@@ -19,4 +19,8 @@ export async function checkSessionIdExists(
   if (meal.session_id !== sessionId) {
     return reply.status(401).send({ message: 'Unauthorized' })
   }
+
+  // If the user's session matches the session stored in the meals table,
+  // allow the user to view, edit, or delete the meal
+  // Your code to handle the request goes here...
 }
