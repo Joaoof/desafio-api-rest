@@ -4,13 +4,13 @@
   import { randomUUID } from 'node:crypto'
   import { knex } from '../src/database'
   import { checkSessionIdExists } from '../src/middlewares/check-session-id-exists'
-  import { checkMealPermission } from '../src/middlewares/check-meal-permission'
+  // import { checkMealPermission } from '../src/middlewares/check-meal-permission'
 
   export async function mealsRoutes(app: FastifyInstance) {
     app.get(
       '/',
       {
-        preHandler: [checkSessionIdExists, checkMealPermission],
+        preHandler: [checkSessionIdExists]
       },
       async (request, reply) => {
         const { sessionId } = request.cookies
@@ -28,7 +28,7 @@
     app.get(
       '/:id',
       {
-        preHandler: [checkSessionIdExists, checkMealPermission],
+        preHandler: [checkSessionIdExists]
       },
       async (request) => {
         const getMealsParamsSchema = z.object({
@@ -53,7 +53,7 @@
     app.get(
       '/summary',
       {
-        preHandler: [checkSessionIdExists],
+        preHandler: [checkSessionIdExists]
       },
       async (request) => {
         const { sessionId } = request.cookies
@@ -144,15 +144,14 @@
           time,
           isDiet,
           session_id: sessionId,
-        });
+        })
     
         return reply.status(201).send()
-      },
-      )
+      })
       app.put(
         '/:id',
         {
-          preHandler: [checkSessionIdExists, checkMealPermission],
+          preHandler: [checkSessionIdExists]
         },
         async (request, reply) => {
           const updateMealBodySchema = z.object({
@@ -205,7 +204,7 @@
         app.delete(
           '/:id',
           {
-            preHandler: [checkSessionIdExists, checkMealPermission],
+            preHandler: [checkSessionIdExists]
           },
           async (request, reply) => {
             const deleteMealsParamsSchema = z.object({
@@ -239,7 +238,7 @@
           app.get(
             '/metrics',
             {
-              preHandler: [checkSessionIdExists, checkMealPermission],
+              preHandler: [checkSessionIdExists]
             },
             async (request) => {
               const { sessionId } = request.cookies
