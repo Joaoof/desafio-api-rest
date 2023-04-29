@@ -18,7 +18,7 @@
         const meal = await knex('meals').where('session_id', sessionId).select('')
         // return { total: 3, meals }
 
-        const tables = await knex('meals-register').where('session_id', sessionId).select('')
+        const tables = await knex('meals-register').where('session_id', sessionId).select('*')
 
 
         return { meal, tables }

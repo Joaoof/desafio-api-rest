@@ -122,7 +122,7 @@ describe('Meals routes', () => {
       .set('Cookie', cookies)
       .expect(200)
 
-    expect(listMealsResponse.body.meal).toEqual([
+    expect(listMealsResponse.body.tables).toEqual([
       expect.objectContaining({
         name: 'Almoço',
         description: 'Arroz, feijão, carne e salada',
